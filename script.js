@@ -62,6 +62,7 @@ let map;
 let loadEvent;
 let workOut;
 let workOuts = [];
+const zoomLevel = 13;
 class App {
 
 
@@ -69,6 +70,7 @@ class App {
         this._getPosition();
         form.addEventListener('submit', this._newWorkout.bind(this));
         inputType.addEventListener('change', this._toggleElevationField);
+        containerWorkouts.addEventListener('click', this._moveToPopup.bind(this))
     };
 
     _getPosition() {
@@ -80,7 +82,7 @@ class App {
         const { latitude, longitude } = position.coords;
 
         //For Leaflet Library
-        map = L.map('map').setView([latitude, longitude], 13);
+        map = L.map('map').setView([latitude, longitude], zoomLevel);
 
         L.tileLayer('https://{s}.tile.openstreetmap.org/{z}/{x}/{y}.png', {
             attribution: '&copy; <a href="https://www.openstreetmap.org/copyright">OpenStreetMap</a> contributors'
@@ -227,6 +229,21 @@ class App {
               `;
 
         form.insertAdjacentHTML('afterend', html);
+    }
+
+    _moveToPopup(e) {
+        const workoutEl = e.target.closest('.workout');
+        console.log(workoutEl);
+
+        if (!workoutEl) return;
+
+        const workout = workOuts.find(work => work.id === workoutEl.dataset.id);
+        map.setView(workout.coords, zoomLevel, {
+            animate: true,
+            pan: {
+                duration: 1
+            }
+        });
     }
 
 
